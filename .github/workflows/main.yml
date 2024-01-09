@@ -1,0 +1,41 @@
+name: Flutter Android CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Upload APK to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v2
+        with:
+          appId: defcomm-286c2
+          token: 1//03LlV4Zw_XqQ7CgYIARAAGAMSNwF-L9IrMf4o5atGKuoFOzv5Gl8XPToF_z3gJtwuUSXH5l6Ba_JzQog25Km5CVoaxNkykAOMDsg
+          groups: internal-testers
+          file: build/app/outputs/flutter-apk/app-release.apk
